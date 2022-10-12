@@ -51,7 +51,7 @@ size 9,1,5.
 
 After tunning the hyper-parameter, the model shows some improvement regarding the loss rate and the complexity of the parameter.The increase in complexity will force our machine to spend extra space and time.
 
-<img src="../reports/figures/compa.jpg" alt="Alt text" title="Optional title" style="width:100%">
+<img src="../reports/figures/compa.JPG" alt="Alt text" title="Optional title" style="width:100%">
 
 Also to overcome the under-fitting performance of the model.An excess neural layers were introduced so that it can benefit from increasing the depth. now the model's architecture is 9-5-5-5-1-5.
 
