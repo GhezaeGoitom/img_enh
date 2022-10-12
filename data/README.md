@@ -1,5 +1,3 @@
-# Dataset Card for Image Enhancement using SRCNN
-
 ---
 annotations_creators:
 - expert-generated
@@ -24,6 +22,9 @@ task_categories:
 task_ids:
 - image-captioning
 ---
+
+# Dataset Card for Image Enhancement using SRCNN
+
 ## Table of Contents
 - [Table of Contents](#table-of-contents)
 - [Dataset Description](#dataset-description)
@@ -47,8 +48,8 @@ task_ids:
 
 ## Dataset Description
 
-- **Homepage:** [LINK](https://www.kaggle.com/datasets/ahmadahmadzada/images2000)
-- **Point of Contact:** [EMAIL] (smalekzp@gmail.com)
+- **Homepage:** https://www.kaggle.com/datasets/ahmadahmadzada/images2000
+- **Point of Contact:** smalekzp@gmail.com
 
 ### Dataset Summary
 
@@ -70,8 +71,11 @@ According to the author all the descriptions are in English.
 
 After the dataset is downloaded and extracted. We will have two folders containing the raw image files and an excel file that stores the description of each image mapped to the id's of the image files.
 
+
 ├── images
+
     ├── images
+
 ├── images_info.xlsx        
     
 
@@ -96,14 +100,14 @@ This image dataset can be used for Image Captioning to generate textual descript
 
 #### Initial Data Collection and Normalization
 
-To fetch the data set the notebook is presented here [LINK] (https://www.kaggle.com/code/kerneler/starter-images2000-119dd37a-6)
+To fetch the data set the notebook is presented [here](https://www.kaggle.com/code/kerneler/starter-images2000-119dd37a-6)
 
 JPG version of images are located in images folder and description of images is image info.xlsx file. image info.xlsx file contains information about id, image name and, caption of the image.
 
 
 #### Who are the source language producers?
 
-According to the autor the whole data was scrapped from [LINK](https://freerangestock.com/gallery.php?gid=42&page_num=1&orderby=code)
+According to the autor the whole data was scrapped from https://freerangestock.com/gallery.php?gid=42&page_num=1&orderby=code
 
 ### Annotations
 
