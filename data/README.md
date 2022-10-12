@@ -1,5 +1,6 @@
 # Dataset Card for Image Enhancement using SRCNN
 
+---
 annotations_creators:
 - expert-generated
 language:
@@ -22,7 +23,7 @@ task_categories:
 - image-to-text
 task_ids:
 - image-captioning
-
+---
 ## Table of Contents
 - [Table of Contents](#table-of-contents)
 - [Dataset Description](#dataset-description)
@@ -59,10 +60,7 @@ ranging from(300 X 300) with a resolution of (96
 X 96) dpi to the largest image (448 X 300) with a
 resolution of (96 X 96) dpi.
 
-<div align="center">
-  <img src="../reports/figures/dataset_sample_images.jpg" alt="dataset sample images" style="width:85%"/>
-</div>
-
+![plot](../reports/figures/dataset_sample_images.jpg)
 
 ### Languages
 
