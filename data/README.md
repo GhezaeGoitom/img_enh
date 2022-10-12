@@ -61,7 +61,7 @@ ranging from(300 X 300) with a resolution of (96
 X 96) dpi to the largest image (448 X 300) with a
 resolution of (96 X 96) dpi.
 
-<img src="../reports/figures/dataset_sample_images.jpg" alt="Alt text" title="Optional title" style="width:100%">
+<img src="../reports/figures/dataset_sample_images.jpg" alt="Alt text" title="Optional title" style="width:50%">
 
 ### Languages
 
