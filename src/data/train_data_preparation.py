@@ -116,22 +116,22 @@ def write_hdf5(data, labels, output_filename):
         # h.create_dataset()
 
 
-def read_training_data(file):
+def read_data(file):
+    print(file)
     with h5py.File(file, 'r') as hf:
         data = numpy.array(hf.get('data'))
         label = numpy.array(hf.get('label'))
+        print('hello')
+        print(data.shape)
         train_data = numpy.transpose(data, (0, 2, 3, 1))
         train_label = numpy.transpose(label, (0, 2, 3, 1))
         return train_data, train_label
 
 
 if __name__ == "__main__":
-    project_dir = os.path.join(os.path.dirname(__file__), os.pardir)
-    dotenv_path = os.path.join(project_dir, '.env')
-    dotenv.load_dotenv(dotenv_path)
     DATA_PATH = os.environ.get("TRAIN_PATH")
     TEST_PATH = os.environ.get("TEST_PATH")
     data, label = prepare_crop_data(DATA_PATH)
-    write_hdf5(data, label, "../data/processed/crop_train.h5")
+    write_hdf5(data, label, "../data/processed/train.h5")
     data, label = prepare_data(TEST_PATH)
     write_hdf5(data, label, "../data/processed/test.h5")
