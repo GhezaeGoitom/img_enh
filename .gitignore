@@ -56,10 +56,6 @@ docs/_build/
 # PyBuilder
 target/
 
-# data
-data/processed
-data/raw
-
 # DotEnv configuration
 .env
 

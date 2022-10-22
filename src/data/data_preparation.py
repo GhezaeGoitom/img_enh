@@ -3,8 +3,6 @@ import os
 import cv2
 import h5py
 import numpy
-import dotenv
-
 
 Random_Crop = 30
 Patch_size = 32
@@ -13,7 +11,7 @@ conv_side = 6
 scale = 2
 
 
-def prepare_data(_path):
+def prepare_test_data(_path):
     names = os.listdir(_path)
     names = sorted(names)
     nums = names.__len__()
@@ -56,7 +54,7 @@ BLOCK_STEP = 16
 BLOCK_SIZE = 32
 
 
-def prepare_crop_data(_path):
+def prepare_train_data(_path):
     names = os.listdir(_path)
     names = sorted(names)
     nums = names.__len__()
@@ -98,23 +96,7 @@ def prepare_crop_data(_path):
 
     data = numpy.array(data, dtype=float)
     label = numpy.array(label, dtype=float)
-    return data, label
-
-
-def write_hdf5(data, labels, output_filename):
-    """
-    This function is used to save image data and its label(s) to hdf5 file.
-    output_file.h5,contain data and label
-    """
-
-    x = data.astype(numpy.float32)
-    y = labels.astype(numpy.float32)
-
-    with h5py.File(output_filename, 'w') as h:
-        h.create_dataset('data', data=x, shape=x.shape)
-        h.create_dataset('label', data=y, shape=y.shape)
-        # h.create_dataset()
-
+    return (data, label)
 
 def read_data(file):
     print(file)
@@ -126,12 +108,3 @@ def read_data(file):
         train_data = numpy.transpose(data, (0, 2, 3, 1))
         train_label = numpy.transpose(label, (0, 2, 3, 1))
         return train_data, train_label
-
-
-if __name__ == "__main__":
-    DATA_PATH = os.environ.get("TRAIN_PATH")
-    TEST_PATH = os.environ.get("TEST_PATH")
-    data, label = prepare_crop_data(DATA_PATH)
-    write_hdf5(data, label, "../data/processed/train.h5")
-    data, label = prepare_data(TEST_PATH)
-    write_hdf5(data, label, "../data/processed/test.h5")

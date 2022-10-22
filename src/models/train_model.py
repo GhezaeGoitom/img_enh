@@ -9,7 +9,7 @@ orginalPath = str(Path(Path(Path(__file__).parent.absolute()).parent.absolute())
 path = str(Path(Path(__file__).parent.absolute()).parent.absolute())
 print(path)
 sys.path.insert(0, path)
-from data import train_data_preparation as pd
+from image_enhancement.src.data import data_preparation as pd
 
 
 import pickle
