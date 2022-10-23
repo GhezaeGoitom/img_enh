@@ -1,0 +1,82 @@
+schema: '2.0'
+stages:
+  make_dataset:
+    cmd: python src/data/make_dataset.py
+    deps:
+    - path: data/raw/dataset.zip
+      md5: d0fbf4cf8c5f0d1e55d2386abd3e8798
+      size: 90086968
+    - path: src/data/make_dataset.py
+      md5: d1c441a93cb278475ea7141f87d8db62
+      size: 2456
+    outs:
+    - path: data/raw/final/srcnn/test
+      md5: 58e8285d686e0bf05d3cbe41666dbd48.dir
+      size: 784385
+      nfiles: 20
+    - path: data/raw/final/srcnn/train
+      md5: 842838dc47543276a6118891884aea5b.dir
+      size: 3330983
+      nfiles: 80
+  data_preparation_for_training:
+    cmd: python src/data/data_preparation.py
+    deps:
+    - path: data/raw/final/srcnn/test/
+      md5: 58e8285d686e0bf05d3cbe41666dbd48.dir
+      size: 784385
+      nfiles: 20
+    - path: data/raw/final/srcnn/train/
+      md5: 842838dc47543276a6118891884aea5b.dir
+      size: 3330983
+      nfiles: 80
+    outs:
+    - path: data/processed/test.h5
+      md5: 5c9690336a18c8de8b2a7ef636617027
+      size: 3419648
+    - path: data/processed/train.h5
+      md5: 3e4c569806557a98e6d447b799440a76
+      size: 144270336
+  training:
+    cmd: python src/models/train_model.py
+    deps:
+    - path: data/processed/test.h5
+      md5: 5c9690336a18c8de8b2a7ef636617027
+      size: 3419648
+    - path: data/processed/train.h5
+      md5: 3e4c569806557a98e6d447b799440a76
+      size: 144270336
+    - path: src/models/params.yaml
+      md5: eab2585bbc34b780857548c69a974253
+      size: 93
+    outs:
+    - path: src/metrics/train_metric.txt
+      md5: 934b82ace742f18738a17e6c1f6b56a8
+      size: 401
+    - path: src/weights/SRCNN_weight_1.h5
+      md5: eeca03efb6e0182c4a93b0a550c015af
+      size: 278560
+    - path: src/weights/SRCNN_weight_3.h5
+      md5: c4cba3408d4bbd35bc2291c7d34ed968
+      size: 1065088
+    - path: src/weights/SRCNN_weight_5.h5
+      md5: 45985c53af7c456f4833523dcb69f619
+      size: 2637952
+  evaluation:
+    cmd: python src/models/predict_model.py
+    deps:
+    - path: data/raw/faces.jpeg
+      md5: 0b16354b8f154b028f4f43724a18b3a7
+      size: 113350
+    - path: src/weights/SRCNN_weight_5.h5
+      md5: 45985c53af7c456f4833523dcb69f619
+      size: 2637952
+    outs:
+    - path: data/processed/faces.jpg
+      md5: 5d0824e69167a27ed5aad5ffb7e628db
+      size: 130862
+    - path: data/processed/output_faces.jpg
+      md5: b6a5860dea050ab45335ad795827fe64
+      size: 152220
+    - path: src/metrics/evaluate_metric.txt
+      md5: 46f267c1621fa54c5deebb87b0b76175
+      size: 85

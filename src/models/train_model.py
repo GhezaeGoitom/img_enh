@@ -5,16 +5,30 @@ from keras.callbacks import ModelCheckpoint
 from pathlib import Path
 import sys
 import mlflow
+import yaml 
+import time
+import json
+import h5py
+import numpy
+
 orginalPath = str(Path(Path(Path(__file__).parent.absolute()).parent.absolute()).parent.absolute())
-path = str(Path(Path(__file__).parent.absolute()).parent.absolute())
-print(path)
-sys.path.insert(0, path)
-from data import train_data_preparation as pd
 
 
 import pickle
 import os
 import dotenv
+
+
+def read_data(file):
+    print(file)
+    with h5py.File(file, 'r') as hf:
+        data = numpy.array(hf.get('data'))
+        label = numpy.array(hf.get('label'))
+        print('hello')
+        print(data.shape)
+        train_data = numpy.transpose(data, (0, 2, 3, 1))
+        train_label = numpy.transpose(label, (0, 2, 3, 1))
+        return train_data, train_label
 
 
 # define the SRCNN model
@@ -47,47 +61,56 @@ def srcnnModel(layer1, layer2, layer3):
 
 
 def train(layer1,layer2,layer3):
+    # Measure training time
+    start_time = time.time()
+
     srcnn_model = srcnnModel(layer1,layer2,layer3)
     print(srcnn_model.summary())
-    PROCESSED_DATA_PATH = os.environ.get("PROCESSED_DATA_PATH")
-    PROCESSED_TEST_PATH = os.environ.get("PROCESSED_TEST_PATH")
-    data, label = pd.read_data(orginalPath+"/data/processed/srcnn_train.h5")
-    val_data, val_label = pd.read_data(orginalPath+"/data/processed/srcnn_test.h5")
+    data, label = read_data(orginalPath+"/data/processed/train.h5")
+    val_data, val_label = read_data(orginalPath+"/data/processed/test.h5")
 
-    checkpoint = ModelCheckpoint("SRCNN_check.h5", monitor='val_loss', verbose=1, save_best_only=True,
+    checkpoint = ModelCheckpoint(f"{orginalPath}/src/weights/SRCNN_weight_{layer2}.h5", monitor='val_loss', verbose=1, save_best_only=True,
                                  save_weights_only=False, mode='min')
     callbacks_list = [checkpoint]
 
-    history = srcnn_model.fit(data, label, batch_size=128, validation_data=(val_data, val_label),
+    history = srcnn_model.fit(data, label, batch_size=64, validation_data=(val_data, val_label),
                     callbacks=callbacks_list, shuffle=True, epochs=1, verbose=0)
 
-    
+# end time
+    end_time = time.time()
+
+# loging to ml flow
     mlflow.log_metrics(
     {
         "accuracy": history.history['loss'][0],
         "val_accuracy": history.history['val_loss'][0],
+        "train time": end_time-start_time
     }
-)                
+
+)    
+
+# saving the matric in json
+    with open(f'{orginalPath}/src/metrics/train_metric.txt', 'a') as fl:
+        fl.write(f"model_with_layer: 9,{layer2},5 \n accuracy: {history.history['loss'][0]}, \n val_accuracy: {history.history['val_loss'][0]},  \n training_time: {end_time - start_time} \n")
+    print("done.")
     
 
 def train_experiment_parameters():
     rows, cols = (3, 3)
-    arr = [[0 for i in range(cols)] for j in range(rows)]
-    arr[0] = [9,1,5]
-    arr[1] = [9,3,5]
-    arr[2] = [9,5,5]
+    arr = [[0 for _ in range(cols)] for _ in range(rows)]
+
     return arr
 
 
 if __name__ == "__main__":
-    global PROCESSED_DATA_PATH
-    global PROCESSED_TEST_PATH
-    # dotenv_path = os.path.join(path, '.env')
-    # dotenv.load_dotenv(dotenv_path)
-    params = train_experiment_parameters()
+    params = yaml.safe_load(open(f'{orginalPath}/src/models/params.yaml'))["learn"]["kernel_size"]
     for row in params:
         # Start mlflow run
         mlflow.start_run()
         train(row[0],row[1],row[2])
         # End mlflow run
         mlflow.end_run()
+
+
+# dvc run -n training -d src/models/params.yaml -d data/processed/train.h5 -d data/processed/test.h5 -M src/metrics/train_metric.txt -o src/weights/SRCNN_weight_1.h5 -o src/weights/SRCNN_weight_3.h5 -o src/weights/SRCNN_weight_5.h5 python src/models/train_model.py
+

@@ -1,0 +1,41 @@
+stages:
+  make_dataset:
+    cmd: python src/data/make_dataset.py
+    deps:
+    - data/raw/dataset.zip
+    - src/data/make_dataset.py
+    outs:
+    - data/raw/final/srcnn/test
+    - data/raw/final/srcnn/train
+  data_preparation_for_training:
+    cmd: python src/data/data_preparation.py
+    deps:
+    - data/raw/final/srcnn/test/
+    - data/raw/final/srcnn/train/
+    outs:
+    - data/processed/test.h5
+    - data/processed/train.h5
+  training:
+    cmd: python src/models/train_model.py
+    deps:
+    - data/processed/test.h5
+    - data/processed/train.h5
+    - src/models/params.yaml
+    outs:
+    - src/weights/SRCNN_weight_1.h5
+    - src/weights/SRCNN_weight_3.h5
+    - src/weights/SRCNN_weight_5.h5
+    metrics:
+    - src/metrics/train_metric.txt:
+        cache: false
+  evaluation:
+    cmd: python src/models/predict_model.py
+    deps:
+    - data/raw/faces.jpeg
+    - src/weights/SRCNN_weight_5.h5
+    outs:
+    - data/processed/faces.jpg
+    - data/processed/output_faces.jpg
+    metrics:
+    - src/metrics/evaluate_metric.txt:
+        cache: false

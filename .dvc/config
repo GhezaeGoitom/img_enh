@@ -1,0 +1,6 @@
+[core]
+    remote = myremote
+['remote "myremote"']
+    url = gdrive://1FrBeoGlWJbIQrXBnDkBmPQWm2JnVdl6D
+['remote "origin"']
+    url = https://dagshub.com/GhezaeGoitom/image_enhancement.dvc
