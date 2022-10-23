@@ -40,8 +40,8 @@ def split_dataset(path):
     trainPath = f'{imagePath}/train'
     testPath = f'{imagePath}/test'
 
-    trainimagePath = make_folder(trainimagePath)
-    testimagePath = make_folder(testimagePath)
+    trainimagePath = make_folder(trainPath)
+    testimagePath = make_folder(testPath)
     
     for (_, _, files) in os.walk(crsPath):
         for filename in files:

@@ -1,0 +1,20 @@
+schema: '2.0'
+stages:
+  make_dataset:
+    cmd: python src/data/make_dataset.py
+    deps:
+    - path: data/raw/dataset.zip
+      md5: d0fbf4cf8c5f0d1e55d2386abd3e8798
+      size: 90086968
+    - path: src/data/make_dataset.py
+      md5: d1c441a93cb278475ea7141f87d8db62
+      size: 2456
+    outs:
+    - path: data/raw/final/srcnn/test
+      md5: 58e8285d686e0bf05d3cbe41666dbd48.dir
+      size: 784385
+      nfiles: 20
+    - path: data/raw/final/srcnn/train
+      md5: 842838dc47543276a6118891884aea5b.dir
+      size: 3330983
+      nfiles: 80

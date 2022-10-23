@@ -1,0 +1,9 @@
+stages:
+  make_dataset:
+    cmd: python src/data/make_dataset.py
+    deps:
+    - data/raw/dataset.zip
+    - src/data/make_dataset.py
+    outs:
+    - data/raw/final/srcnn/test
+    - data/raw/final/srcnn/train
