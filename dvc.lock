@@ -61,3 +61,22 @@ stages:
     - path: src/weights/SRCNN_weight_5.h5
       md5: 45985c53af7c456f4833523dcb69f619
       size: 2637952
+  evaluation:
+    cmd: python src/models/predict_model.py
+    deps:
+    - path: data/raw/faces.jpeg
+      md5: 0b16354b8f154b028f4f43724a18b3a7
+      size: 113350
+    - path: src/weights/SRCNN_weight_5.h5
+      md5: 45985c53af7c456f4833523dcb69f619
+      size: 2637952
+    outs:
+    - path: data/processed/faces.jpg
+      md5: 5d0824e69167a27ed5aad5ffb7e628db
+      size: 130862
+    - path: data/processed/output_faces.jpg
+      md5: b6a5860dea050ab45335ad795827fe64
+      size: 152220
+    - path: src/metrics/evaluate_metric.txt
+      md5: 46f267c1621fa54c5deebb87b0b76175
+      size: 85

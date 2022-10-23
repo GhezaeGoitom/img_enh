@@ -28,3 +28,14 @@ stages:
     metrics:
     - src/metrics/train_metric.txt:
         cache: false
+  evaluation:
+    cmd: python src/models/predict_model.py
+    deps:
+    - data/raw/faces.jpeg
+    - src/weights/SRCNN_weight_5.h5
+    outs:
+    - data/processed/faces.jpg
+    - data/processed/output_faces.jpg
+    metrics:
+    - src/metrics/evaluate_metric.txt:
+        cache: false
