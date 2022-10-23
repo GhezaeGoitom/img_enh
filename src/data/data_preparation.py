@@ -5,11 +5,7 @@ import h5py
 import numpy
 from pathlib import Path
 
-Random_Crop = 30
-Patch_size = 32
-label_size = 20
-conv_side = 6
-scale = 2
+
 
 
 def prepare_test_data(_path):
@@ -17,8 +13,8 @@ def prepare_test_data(_path):
     names = sorted(names)
     nums = names.__len__()
 
-    data = numpy.zeros((nums * Random_Crop, 1, Patch_size, Patch_size), dtype=numpy.double)
-    label = numpy.zeros((nums * Random_Crop, 1, label_size, label_size), dtype=numpy.double)
+    data = numpy.zeros((nums * 30, 1, 32, 32), dtype=numpy.double)
+    label = numpy.zeros((nums * 30, 1, 20, 20), dtype=numpy.double)
 
     for i in range(nums):
         name = _path + names[i]
@@ -28,23 +24,23 @@ def prepare_test_data(_path):
         hr_img = cv2.cvtColor(hr_img, cv2.COLOR_BGR2YCrCb)
         hr_img = hr_img[:, :, 0]
 
-        # two resize operation to produce training data and labels
-        lr_img = cv2.resize(hr_img, (shape[1] / scale, shape[0] / scale))
+         # two resize operation to produce training data and labels
+        lr_img = cv2.resize(hr_img, (int(shape[1] / 2), int(shape[0] / 2)))
         lr_img = cv2.resize(lr_img, (shape[1], shape[0]))
 
         # produce Random_Crop random coordinate to crop training img
-        Points_x = numpy.random.randint(0, min(shape[0], shape[1]) - Patch_size, Random_Crop)
-        Points_y = numpy.random.randint(0, min(shape[0], shape[1]) - Patch_size, Random_Crop)
+        Points_x = numpy.random.randint(0, min(shape[0], shape[1]) - 32, 30)
+        Points_y = numpy.random.randint(0, min(shape[0], shape[1]) - 32, 30)
 
-        for j in range(Random_Crop):
-            lr_patch = lr_img[Points_x[j]: Points_x[j] + Patch_size, Points_y[j]: Points_y[j] + Patch_size]
-            hr_patch = hr_img[Points_x[j]: Points_x[j] + Patch_size, Points_y[j]: Points_y[j] + Patch_size]
+        for j in range(30):
+            lr_patch = lr_img[Points_x[j]: Points_x[j] + 32, Points_y[j]: Points_y[j] + 32]
+            hr_patch = hr_img[Points_x[j]: Points_x[j] + 32, Points_y[j]: Points_y[j] + 32]
 
             lr_patch = lr_patch.astype(float) / 255.
             hr_patch = hr_patch.astype(float) / 255.
 
-            data[i * Random_Crop + j, 0, :, :] = lr_patch
-            label[i * Random_Crop + j, 0, :, :] = hr_patch[conv_side: -conv_side, conv_side: -conv_side]
+            data[i * 30 + j, 0, :, :] = lr_patch
+            label[i * 30 + j, 0, :, :] = hr_patch[6: -6, 6: -6]
             # cv2.imshow("lr", lr_patch)
             # cv2.imshow("hr", hr_patch)
             # cv2.waitKey(0)
@@ -69,13 +65,16 @@ def prepare_train_data(_path):
         hr_img = cv2.cvtColor(hr_img, cv2.COLOR_BGR2YCrCb)
         hr_img = hr_img[:, :, 0]
         shape = hr_img.shape
+        print('hello')
+        print(shape)
 
-        # two resize operation to produce training data and labels
-        lr_img = cv2.resize(hr_img, (shape[1] / scale, shape[0] / scale))
+ # two resize operation to produce training data and labels
+        lr_img = cv2.resize(hr_img, (int(shape[1] / 2), int(shape[0] / 2)))
         lr_img = cv2.resize(lr_img, (shape[1], shape[0]))
 
-        width_num = (shape[0] - (BLOCK_SIZE - BLOCK_STEP) * 2) / BLOCK_STEP
-        height_num = (shape[1] - (BLOCK_SIZE - BLOCK_STEP) * 2) / BLOCK_STEP
+        width_num = int((shape[0] - (BLOCK_SIZE - BLOCK_STEP) * 2) / BLOCK_STEP)
+        height_num = int((shape[1] - (BLOCK_SIZE - BLOCK_STEP) * 2) / BLOCK_STEP)
+
         for k in range(width_num):
             for j in range(height_num):
                 x = k * BLOCK_STEP
@@ -86,11 +85,11 @@ def prepare_train_data(_path):
                 lr_patch = lr_patch.astype(float) / 255.
                 hr_patch = hr_patch.astype(float) / 255.
 
-                lr = numpy.zeros((1, Patch_size, Patch_size), dtype=numpy.double)
-                hr = numpy.zeros((1, label_size, label_size), dtype=numpy.double)
+                lr = numpy.zeros((1, 32, 32), dtype=numpy.double)
+                hr = numpy.zeros((1, 20, 20), dtype=numpy.double)
 
                 lr[0, :, :] = lr_patch
-                hr[0, :, :] = hr_patch[conv_side: -conv_side, conv_side: -conv_side]
+                hr[0, :, :] = hr_patch[6: -6, 6: -6]
 
                 data.append(lr)
                 label.append(hr)
@@ -98,17 +97,6 @@ def prepare_train_data(_path):
     data = numpy.array(data, dtype=float)
     label = numpy.array(label, dtype=float)
     return (data, label)
-
-def read_data(file):
-    print(file)
-    with h5py.File(file, 'r') as hf:
-        data = numpy.array(hf.get('data'))
-        label = numpy.array(hf.get('label'))
-        print('hello')
-        print(data.shape)
-        train_data = numpy.transpose(data, (0, 2, 3, 1))
-        train_label = numpy.transpose(label, (0, 2, 3, 1))
-        return train_data, train_label
 
 
 def write_hdf5(data, labels, output_filename):
@@ -121,10 +109,12 @@ def write_hdf5(data, labels, output_filename):
 
 if __name__ == '__main__':
     orginalPath = str(Path(Path(Path(__file__).parent.absolute()).parent.absolute()).parent.absolute())
-    trainPath = f'{orginalPath}/data/raw/final/srcnn/train'
-    testPath = f'{orginalPath}/data/raw/final/srcnn/test'
+    trainPath = f'{orginalPath}/data/raw/final/srcnn/train/'
+    testPath = f'{orginalPath}/data/raw/final/srcnn/test/'
     (data,label) = prepare_train_data(trainPath)
     write_hdf5(data,label,f'{orginalPath}/data/processed/train.h5')
     (data2,label2) = prepare_test_data(testPath)
     write_hdf5(data2,label2,f'{orginalPath}/data/processed/test.h5')
      
+
+# dvc run -n data_preparation_for_training -d data/raw/final/srcnn/train/ -d data/raw/final/srcnn/test/ -o data/processed/train.h5 -o data/processed/test.h5 python src/data/data_preparation.py

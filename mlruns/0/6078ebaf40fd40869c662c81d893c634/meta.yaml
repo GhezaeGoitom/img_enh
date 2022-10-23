@@ -1,0 +1,15 @@
+artifact_uri: ./mlruns/0/6078ebaf40fd40869c662c81d893c634/artifacts
+end_time: 1666542321553
+entry_point_name: ''
+experiment_id: '0'
+lifecycle_stage: active
+name: ''
+run_id: 6078ebaf40fd40869c662c81d893c634
+run_uuid: 6078ebaf40fd40869c662c81d893c634
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1666542147898
+status: 3
+tags: []
+user_id: GG_DEVELOPER
