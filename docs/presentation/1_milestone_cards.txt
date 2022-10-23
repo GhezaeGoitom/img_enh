@@ -1,0 +1,5 @@
+the first milestone presenation was about 
+
+1, coockiecutter template
+2, dataset card, can be found in [data/README.md]
+3, model card, can be found in [model/README.md]

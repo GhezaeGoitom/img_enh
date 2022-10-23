@@ -3,20 +3,13 @@ from keras.layers import Conv2D
 from tensorflow.keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 from pathlib import Path
-import sys
 import mlflow
 import yaml 
 import time
-import json
 import h5py
 import numpy
 
 orginalPath = str(Path(Path(Path(__file__).parent.absolute()).parent.absolute()).parent.absolute())
-
-
-import pickle
-import os
-import dotenv
 
 
 def read_data(file):
