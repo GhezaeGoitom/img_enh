@@ -3,6 +3,7 @@ import os
 import cv2
 import h5py
 import numpy
+from pathlib import Path
 
 Random_Crop = 30
 Patch_size = 32
@@ -108,3 +109,22 @@ def read_data(file):
         train_data = numpy.transpose(data, (0, 2, 3, 1))
         train_label = numpy.transpose(label, (0, 2, 3, 1))
         return train_data, train_label
+
+
+def write_hdf5(data, labels, output_filename):
+    x = data.astype(numpy.float32)
+    y = labels.astype(numpy.float32)
+    with h5py.File(output_filename, 'w') as h:
+        h.create_dataset('data', data=x, shape=x.shape)
+        h.create_dataset('label', data=y, shape=y.shape)
+
+
+if __name__ == '__main__':
+    orginalPath = str(Path(Path(Path(__file__).parent.absolute()).parent.absolute()).parent.absolute())
+    trainPath = f'{orginalPath}/data/raw/final/srcnn/train'
+    testPath = f'{orginalPath}/data/raw/final/srcnn/test'
+    (data,label) = prepare_train_data(trainPath)
+    write_hdf5(data,label,f'{orginalPath}/data/processed/train.h5')
+    (data2,label2) = prepare_test_data(testPath)
+    write_hdf5(data2,label2,f'{orginalPath}/data/processed/test.h5')
+     
