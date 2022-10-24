@@ -3,20 +3,13 @@ from keras.layers import Conv2D
 from tensorflow.keras.optimizers import Adam
 from keras.callbacks import ModelCheckpoint
 from pathlib import Path
-import sys
 import mlflow
 import yaml 
 import time
-import json
 import h5py
 import numpy
 
 orginalPath = str(Path(Path(Path(__file__).parent.absolute()).parent.absolute()).parent.absolute())
-
-
-import pickle
-import os
-import dotenv
 
 
 def read_data(file):
@@ -89,7 +82,7 @@ def train(layer1,layer2,layer3):
 
 )    
 
-# saving the matric in json
+# saving the matric in text
     with open(f'{orginalPath}/src/metrics/train_metric.txt', 'a') as fl:
         fl.write(f"model_with_layer: 9,{layer2},5 \n accuracy: {history.history['loss'][0]}, \n val_accuracy: {history.history['val_loss'][0]},  \n training_time: {end_time - start_time} \n")
     print("done.")
