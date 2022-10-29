@@ -7,6 +7,56 @@ from pathlib import Path
 
 
 
+# BORDER_CUT = 8
+BLOCK_STEP = 16
+BLOCK_SIZE = 32
+
+
+def test_resize_crop_coordinates(hr_img, shape):
+     # two resize operation to produce training data and labels
+        lr_img = cv2.resize(hr_img, (int(shape[1] / 2), int(shape[0] / 2)))
+        lr_img = cv2.resize(lr_img, (shape[1], shape[0]))
+
+        # produce Random_Crop random coordinate to crop training img
+        points_x = numpy.random.randint(0, min(shape[0], shape[1]) - 32, 30)
+        points_y = numpy.random.randint(0, min(shape[0], shape[1]) - 32, 30)
+        return (points_x,points_y,lr_img)   
+
+def test_random_cropp(i,j,lr_img,hr_img,points_x,points_y):
+        lr_patch = lr_img[points_x[j]: points_x[j] + 32, points_y[j]: points_y[j] + 32]
+        hr_patch = hr_img[points_x[j]: points_x[j] + 32, points_y[j]: points_y[j] + 32]
+
+        lr_patch = lr_patch.astype(float) / 255.
+        hr_patch = hr_patch.astype(float) / 255.
+
+        data[i * 30 + j, 0, :, :] = lr_patch
+        label[i * 30 + j, 0, :, :] = hr_patch[6: -6, 6: -6]
+        return (data,label)
+
+def train_resize_crop_coordinates(hr_img,shape):
+        # two resize operation to produce training data and labels
+        lr_img = cv2.resize(hr_img, (int(shape[1] / 2), int(shape[0] / 2)))
+        lr_img = cv2.resize(lr_img, (shape[1], shape[0]))
+
+        width_num = int((shape[0] - (BLOCK_SIZE - BLOCK_STEP) * 2) / BLOCK_STEP)
+        height_num = int((shape[1] - (BLOCK_SIZE - BLOCK_STEP) * 2) / BLOCK_STEP)
+        return (width_num,height_num)       
+
+def train_random_crop(k,j,hr_img,lr_img):
+        x = k * BLOCK_STEP
+        y = j * BLOCK_STEP
+        hr_patch = hr_img[x: x + BLOCK_SIZE, y: y + BLOCK_SIZE]
+        lr_patch = lr_img[x: x + BLOCK_SIZE, y: y + BLOCK_SIZE]
+
+        lr_patch = lr_patch.astype(float) / 255.
+        hr_patch = hr_patch.astype(float) / 255.
+
+        lr = numpy.zeros((1, 32, 32), dtype=numpy.double)
+        hr = numpy.zeros((1, 20, 20), dtype=numpy.double)
+
+        lr[0, :, :] = lr_patch
+        hr[0, :, :] = hr_patch[6: -6, 6: -6]
+        return (lr,hr)
 
 def prepare_test_data(_path):
     names = os.listdir(_path)
@@ -24,31 +74,13 @@ def prepare_test_data(_path):
         hr_img = cv2.cvtColor(hr_img, cv2.COLOR_BGR2YCrCb)
         hr_img = hr_img[:, :, 0]
 
-         # two resize operation to produce training data and labels
-        lr_img = cv2.resize(hr_img, (int(shape[1] / 2), int(shape[0] / 2)))
-        lr_img = cv2.resize(lr_img, (shape[1], shape[0]))
-
-        # produce Random_Crop random coordinate to crop training img
-        Points_x = numpy.random.randint(0, min(shape[0], shape[1]) - 32, 30)
-        Points_y = numpy.random.randint(0, min(shape[0], shape[1]) - 32, 30)
+        (points_x,points_y,lr_img) = test_resize_crop_coordinates(hr_img,shape)
 
         for j in range(30):
-            lr_patch = lr_img[Points_x[j]: Points_x[j] + 32, Points_y[j]: Points_y[j] + 32]
-            hr_patch = hr_img[Points_x[j]: Points_x[j] + 32, Points_y[j]: Points_y[j] + 32]
+            (data,label) = random_cropping(i,j,lr_img,hr_img,points_x,points_y)
 
-            lr_patch = lr_patch.astype(float) / 255.
-            hr_patch = hr_patch.astype(float) / 255.
-
-            data[i * 30 + j, 0, :, :] = lr_patch
-            label[i * 30 + j, 0, :, :] = hr_patch[6: -6, 6: -6]
-            # cv2.imshow("lr", lr_patch)
-            # cv2.imshow("hr", hr_patch)
-            # cv2.waitKey(0)
     return data, label
 
-# BORDER_CUT = 8
-BLOCK_STEP = 16
-BLOCK_SIZE = 32
 
 
 def prepare_train_data(_path):
@@ -77,20 +109,7 @@ def prepare_train_data(_path):
 
         for k in range(width_num):
             for j in range(height_num):
-                x = k * BLOCK_STEP
-                y = j * BLOCK_STEP
-                hr_patch = hr_img[x: x + BLOCK_SIZE, y: y + BLOCK_SIZE]
-                lr_patch = lr_img[x: x + BLOCK_SIZE, y: y + BLOCK_SIZE]
-
-                lr_patch = lr_patch.astype(float) / 255.
-                hr_patch = hr_patch.astype(float) / 255.
-
-                lr = numpy.zeros((1, 32, 32), dtype=numpy.double)
-                hr = numpy.zeros((1, 20, 20), dtype=numpy.double)
-
-                lr[0, :, :] = lr_patch
-                hr[0, :, :] = hr_patch[6: -6, 6: -6]
-
+                (lr,hr) = train_random_crop(k,j,hr_img,lr_img)
                 data.append(lr)
                 label.append(hr)
 
