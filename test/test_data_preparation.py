@@ -30,7 +30,7 @@ def test_test_resize_crop_coordinates(shape_x,shape_y):
     (300,300),
     (448,448)])  
 
-def test_train_random_crop(getImage,train_shape_x,train_shape_y):
+def test_train_random_crop(train_shape_x,train_shape_y):
     (width_num,height_num) = DataPreprocess.train_resize_crop_coordinates(train_shape_x,train_shape_y)
     assert width_num > 0
     assert height_num > 0
