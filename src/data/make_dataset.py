@@ -1,12 +1,8 @@
 from pathlib import Path
-from dotenv import find_dotenv, load_dotenv
 from pyunpack import Archive
-import numpy
-import h5py
 import os
 from random import choice
 import shutil
-import data_preparation as data_preparation
 
 
 def main(originalPath):
