@@ -86,7 +86,7 @@ class TrainModel:
             fl.write(f"model_with_layer: 9,{layer2},5 \n accuracy: {history.history['loss'][0]}, \n val_accuracy: {history.history['val_loss'][0]},  \n training_time: {end_time - start_time} \n")
         print("done.")
 
-        return (history.history['loss'][0],history.history['val_loss'][0],end_time-start_time)
+        return (history.history['loss'][0],history.history['val_loss'][0],f"{orginalPath}/src/weights/SRCNN_weight_{layer2}.h5")
         
 
     def train_experiment_parameters():
