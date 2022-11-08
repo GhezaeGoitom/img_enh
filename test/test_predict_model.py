@@ -29,15 +29,15 @@ def test_enhanced_image():
 
 
 # Changes in the input should not affect the output
-def invarainceTest(init):
-    (bicubic1,srcnn1) = PredictModel.predict(5,init.IMG_NAME,init.INPUT_NAME,init.OUTPUT_NAME)
-    (bicubic2,srcnn2) = PredictModel.predict(5,init.IMG_NAME,init.INPUT_NAME,init.OUTPUT_NAME) 
-    assert bicubic1 == bicubic2
-    assert srcnn1 == srcnn2
+# def invarainceTest(init):
+#     (bicubic1,srcnn1) = PredictModel.predict(5,init.IMG_NAME,init.INPUT_NAME,init.OUTPUT_NAME)
+#     (bicubic2,srcnn2) = PredictModel.predict(5,init.IMG_NAME,init.INPUT_NAME,init.OUTPUT_NAME) 
+#     assert bicubic1 == bicubic2
+#     assert srcnn1 == srcnn2
 
-# Changes in the input should affect the output
-def directionalTest(init):
-    (bicubic1, srcnn1) = PredictModel.predict(5,init.IMG_NAME,init.INPUT_NAME,init.OUTPUT_NAME)
-    (bicubic2, srcnn2) = PredictModel.predict(5,init.INPUT_NAME,init.INPUT_NAME,init.OUTPUT_NAME)
-    assert bicubic1 != bicubic2
-    assert srcnn1 != srcnn2
+# # Changes in the input should affect the output
+# def directionalTest(init):
+#     (bicubic1, srcnn1) = PredictModel.predict(5,init.IMG_NAME,init.INPUT_NAME,init.OUTPUT_NAME)
+#     (bicubic2, srcnn2) = PredictModel.predict(5,init.INPUT_NAME,init.INPUT_NAME,init.OUTPUT_NAME)
+#     assert bicubic1 != bicubic2
+#     assert srcnn1 != srcnn2
