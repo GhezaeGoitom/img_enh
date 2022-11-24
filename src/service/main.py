@@ -84,7 +84,7 @@ class EnhanceModel(BaseModel):
     middle_kernel_size: int
 
     @validator('model_name')
-    def name_must_contain_space(cls, v):
+    def model_is_in_h5_format(cls, v):
         if '.h5' not in v:
             raise ValueError('please choose .h5 extension type model')
         return v.title()
@@ -160,7 +160,8 @@ def kernels( request: Request,
         "message": HTTPStatus.OK.phrase,
         "status-code": HTTPStatus.OK,
         "data": middle
-    }    
+    } 
+       
 
 @app.post('/apps/srcnn/enhance', tags=["Prediction"])
 @construct_response
