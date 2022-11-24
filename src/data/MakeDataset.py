@@ -38,8 +38,8 @@ class MakeDatasets:
         trainPath = f'{imagePath}/train'
         testPath = f'{imagePath}/test'
 
-        trainimagePath = self.make_folder(trainPath)
-        testimagePath = self.make_folder(testPath)
+        self.make_folder(trainPath)
+        self.make_folder(testPath)
         
         for (_, _, files) in os.walk(crsPath):
             for filename in files:
