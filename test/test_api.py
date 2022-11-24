@@ -30,7 +30,7 @@ def test_info():
     assert response.status_code == 200
 
 # test models that has been builded
-def test_stored_models():
+def test_stored_weights():
     response = client.get("/apps/srcnn/models")
     assert response.status_code == 200
     assert response.json()["data"] == retrieve_model_names()

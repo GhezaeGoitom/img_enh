@@ -4,8 +4,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse,JSONResponse
-from pydantic import BaseModel
+from pydantic import BaseModel,ValidationError,validator
 from http import HTTPStatus
+from functools import wraps
+from datetime import datetime
 import yaml
 import random
 import cv2
@@ -14,17 +16,19 @@ import string
 from pathlib import Path
 import sys
 import os
+import imghdr
 import json
 
 
 
 original_path = str(Path(Path(Path(__file__).parent.absolute()).parent.absolute()).parent.absolute())
 sys.path.append(original_path)
+from src.models import PerformSR as sr
 
 middle_kernels = [1,3,5]
 model_names = ['srcnn.h5','srcnn2.h5','srcnn3.h5']
 
-from src.models import PerformSR as sr
+
 app = FastAPI(
     title="Image Enhancement",
     description="Image Enhancement using SRCNN",
@@ -45,13 +49,55 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Construct a JSON response for an endpoint's results
+def construct_response(wrapped_func):
+    @wraps(wrapped_func)
+    def wrap(request: Request, *args, **kwargs):
+        results = wrapped_func(request, *args, **kwargs)
+
+        # return if the response is file
+        if results["response_type"] == "file":
+            return  FileResponse(path= results["path"],media_type=results["c_t"],filename= results["name"])
+        
+        # Construct response
+        response = {
+            "message": results["message"],
+            "method": request.method,
+            "status-code": results["status-code"],
+            "timestamp": datetime.now().isoformat(),
+            "url": request.url._url,  # pylint: disable=protected-access
+        }
+
+        # Add data
+        if "data" in results:
+            response["data"] = results["data"]
+
+        
+
+        return response
+
+    return wrap
+
 
 class EnhanceModel(BaseModel):
     model_name: str
     middle_kernel_size: int
 
+    @validator('model_name')
+    def name_must_contain_space(cls, v):
+        if '.h5' not in v:
+            raise ValueError('please choose .h5 extension type model')
+        return v.title()
+
+    @validator('middle_kernel_size')
+    def kernel_size_must_be(cls,v):
+        if v not in [1,3,5]:
+            raise ValueError('please choose correct middle kernel size')
+        return v.title()
+
+
 class WeightFileModel(BaseModel):
-    model_name: str
+    model_name: str    
 
 
 @app.exception_handler(RequestValidationError)
@@ -62,61 +108,130 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
     )    
 
 @app.get('/',tags=["General"])
-def apps():
-    return {"result": "app started"}
-
-@app.get('/apps/srcnn/health')
-def health():
-    response = {
+@construct_response
+def apps( request: Request,response: Response):
+    return {
+        "response_type": "text",
         "message": HTTPStatus.OK.phrase,
         "status-code": HTTPStatus.OK,
-        "Project Name": "Image Enhancement using SRCNN",
-        "data": {"authors": ["Ghezae Goitom","Yonas Babulet"]},
+        "data": {"result": "app started"}
     }
-    
+
+@app.get('/apps/srcnn/info',tags=["General"])
+@construct_response
+def info( request: Request,
+    response: Response,):
+    response = {
+        "response_type": "text",
+        "message": HTTPStatus.OK.phrase,
+        "status-code": HTTPStatus.OK,
+        "data": {"project-name":"Image Enhancement using SRCNN",
+        "authors": ["Ghezae Goitom","Yonas Babulet"]},
+    }
     return response
 
-@app.get('/apps.srcnn.models')
-async def models():
+@app.get('/apps/srcnn/models',tags=["Models"])
+@construct_response
+def models( request: Request,
+    response: Response):
     models = []
     for(_,_,files) in os.walk(f"{original_path}/src/weights/"):
         for filename in files:
             if ".h5" in filename:
                 models.append(filename)
-    result = json.dumps({"models":models})
-    return Response(result)
+    return {
+        "response_type": "text",
+        "message": HTTPStatus.OK.phrase,
+        "status-code": HTTPStatus.OK,
+        "data": models
+    }
 
 
-@app.get('/apps.srcnn.middle-kernels')
-async def kernels():
+@app.get('/apps/srcnn/middle-kernels',tags=["Parameter"])
+@construct_response
+def kernels( request: Request,
+    response: Response):
     middle = []
     params = yaml.safe_load(open(f'{original_path}/src/models/params.yaml'))["learn"]["kernel_size"]
     for param in params:
-        middle.append(param[1])
-    result = json.dumps({"middle_kernels":middle})    
-    return Response(result)    
+        middle.append(param[1])    
+    return {
+        "response_type": "text",
+        "message": HTTPStatus.OK.phrase,
+        "status-code": HTTPStatus.OK,
+        "data": middle
+    }    
 
-@app.post('/apps.srcnn.enhance')
-async def enhance(enhance: EnhanceModel = Depends(), file: bytes = File(...)):
+@app.post('/apps/srcnn/enhance', tags=["Prediction"])
+@construct_response
+def enhance( request: Request,
+    response: Response,enhance: EnhanceModel = Depends(), file: bytes = File(...)):
+    
     if enhance.model_name not in model_names:
-        raise HTTPException(status_code=404, detail="Model name not found")
+        return {
+        "response_type": "text",   
+        "message": "Model not found",
+        "status-code": HTTPStatus.NOT_FOUND}
+
     if enhance.middle_kernel_size not in middle_kernels:
-        raise HTTPException(status_code=404, detail="Middle kernel size not found")    
+        return {
+        "response_type": "text",    
+        "message": "Kernel size not found",
+        "status-code": HTTPStatus.NOT_FOUND}
+
     filename = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
     image_bytes = Image.open(io.BytesIO(file)).convert("RGB")
     imagePath = f"{original_path}/data/raw/request/{filename}.jpg"
     image_bytes.save(imagePath)
-    path = sr.performSR(cv2.imread(imagePath),original_path,f"{filename}.jpg")
-    bytes_io = io.BytesIO()
-    img = Image.open(path)
-    img.save(bytes_io, format="jpeg")    
-    return Response(content=bytes_io.getvalue(), media_type="image/jpeg")
+    image_type = imghdr.what(imagePath)
+    (x,y) = image_bytes.size
+    
+    if x == 0 and y == 0 :
+        return {
+        "response_type": "text",    
+        "message": "please choose valid image",
+        "status-code": HTTPStatus.BAD_REQUEST}
+
+    if image_type not in ["jpegs","jpgs"]:
+        return {
+        "response_type": "text",    
+        "message": "please choose valid image type of jpeg",
+        "status-code": HTTPStatus.BAD_REQUEST}
+    
+    try:
+       
+        path = sr.performSR(cv2.imread(imagePath),original_path,f"{filename}.jpg")
+        response =  {
+        "response_type": "file",
+        "c_t": "image/jpeg",
+        "path": path,
+        "name": f"{filename}.jpg"}
+    except Exception as ex:
+        response =  {
+            "response_type": "text",
+            "message": ex,
+            "status-code": HTTPStatus.BAD_REQUEST
+        }            
+    return response
 
 
 
-@app.post('/apps.srcnn.weight')
-async def Weight(weight_ref: WeightFileModel):
-    weight_path = f"{original_path}/src/weights/{weight_ref.model_name}"
+@app.get('/apps/srcnn/weight/{weight_name}',tags=["Models"])
+@construct_response
+def Weight( request: Request,
+    response: Response,weight_name: str):
+    weight_path = f"{original_path}/src/weights/{weight_name}"
     if os.path.exists(weight_path) == False:
-        raise HTTPException(status_code=404, detail="Weight not found")
-    return FileResponse(path= weight_path,media_type='application/octet-stream',filename= weight_ref.model_name)  
+        response = {
+        "response_type": "text",    
+        "message": "Weight not found",
+        "status-code": HTTPStatus.NOT_FOUND,
+        "method": request.method
+        }
+        return response
+    return {
+        "response_type": "file",
+        "c_t": "application/octet-stream",
+        "path": weight_path,
+        "name": weight_name}
+    
