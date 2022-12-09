@@ -1,4 +1,4 @@
-FROM tensorflow/tensorflow:2.8.0
+FROM python:3.9
 
 RUN mkdir /app
 COPY . /app
