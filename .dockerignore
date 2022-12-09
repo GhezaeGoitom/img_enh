@@ -1,2 +1,5 @@
-docs/presentation
-docs/
+/docs/presentation
+/notebooks
+/reports
+/.dvc
+/mlruns

@@ -19,7 +19,7 @@ def srcnnModel():
                      activation='linear', padding='valid', use_bias=True))
     
     # define optimizer
-    adam = Adam(lr=0.0003)
+    adam = Adam(learning_rate=0.0003)
     
     # compile model
     SRCNN.compile(optimizer=adam, loss='mean_squared_error', metrics=['mean_squared_error'])
