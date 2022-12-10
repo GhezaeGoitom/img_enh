@@ -1,16 +1,3 @@
-fastapi
-uvicorn
-python-multipart
-pandas
-Pillow
-PyYAML
-httplib2
-pydantic
-opencv-python
-tensorflow~=2.8.0
-keras~=2.8.0
-
-
 fastapi==0.78.0
 httplib2==0.20.2
 lockfile==0.12.2
