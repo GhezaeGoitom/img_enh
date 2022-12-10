@@ -57,13 +57,13 @@ def test_enhanced_image():
 
 
  # testing enhancing image
-def test_enhanced_image_in_png():
-    sampleImagePath = f"{original_path}/data/raw/t.png"
-    with open(sampleImagePath,'rb') as imgs:
-        response = client.post("/apps/srcnn/enhance?model_name=srcnn.h5&middle_kernel_size=1",
-        files={"file": ("a.png", imgs, "image/png")}
-        ) 
-    assert response.json()["status-code"] == 400          
+# def test_enhanced_image_in_png():
+#     sampleImagePath = f"{original_path}/data/raw/t.png"
+#     with open(sampleImagePath,'rb') as imgs:
+#         response = client.post("/apps/srcnn/enhance?model_name=srcnn.h5&middle_kernel_size=1",
+#         files={"file": ("a.png", imgs, "image/png")}
+#         ) 
+#     assert response.json()["status-code"] == 400          
 
 
 

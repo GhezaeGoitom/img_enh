@@ -228,6 +228,7 @@ def enhance( request: Request,
     imagePath = f"{original_path}/data/raw/request/{filename}.jpg"
     image_bytes.save(imagePath)
     image_type = imghdr.what(imagePath)
+    print(image_type)
     (x,y) = image_bytes.size
     
     if x == 0 and y == 0 :
