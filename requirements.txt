@@ -1,3 +1,5 @@
+tensorflow~=2.8.0
+keras~=2.8.0
 fastapi==0.78.0
 httplib2==0.20.2
 matplotlib==3.5.2
@@ -13,3 +15,6 @@ PyYAML==5.4.1
 requests==2.25.1
 tqdm==4.64.0
 uvicorn==0.15.0
+pytest
+pylint
+great_expectations
