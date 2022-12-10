@@ -63,7 +63,7 @@ def test_enhanced_image_in_png():
         response = client.post("/apps/srcnn/enhance?model_name=srcnn.h5&middle_kernel_size=1",
         files={"file": ("a.png", imgs, "image/png")}
         ) 
-    assert response.json()["status-code"] == 400          
+    assert response.status_code == 400          
 
 
 
