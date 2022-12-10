@@ -87,13 +87,13 @@ class EnhanceModel(BaseModel):
     def model_is_in_h5_format(cls, v):
         if '.h5' not in v:
             raise ValueError('please choose .h5 extension type model')
-        return v.title()
+        return v
 
     @validator('middle_kernel_size')
     def kernel_size_must_be(cls,v):
         if v not in [1,3,5]:
             raise ValueError('please choose correct middle kernel size')
-        return v.title()
+        return v
 
 
 class WeightFileModel(BaseModel):
@@ -193,7 +193,7 @@ def enhance( request: Request,
         "message": "please choose valid image",
         "status-code": HTTPStatus.BAD_REQUEST}
 
-    if image_type not in ["jpegs","jpgs"]:
+    if image_type not in ["jpeg","jpg"]:
         return {
         "response_type": "text",    
         "message": "please choose valid image type of jpeg",
@@ -215,6 +215,63 @@ def enhance( request: Request,
         }            
     return response
 
+
+
+
+@app.post('/apps/srcnn/enhancement', tags=["Prediction"])
+@construct_response
+def enhance( request: Request,
+    response: Response, file: bytes = File(...)):
+
+    filename = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
+    image_bytes = Image.open(io.BytesIO(file)).convert("RGB")
+    imagePath = f"{original_path}/data/raw/request/{filename}.jpg"
+    image_bytes.save(imagePath)
+    image_type = imghdr.what(imagePath)
+    (x,y) = image_bytes.size
+    
+    if x == 0 and y == 0 :
+        return {
+        "response_type": "text",    
+        "message": "please choose valid image",
+        "status-code": HTTPStatus.BAD_REQUEST}
+
+    if image_type not in ["jpeg","jpg"]:
+        return {
+        "response_type": "text",    
+        "message": "please choose valid image type of jpeg",
+        "status-code": HTTPStatus.BAD_REQUEST}
+    
+    try:
+       
+        path = sr.performSR(cv2.imread(imagePath),original_path,f"{filename}.jpg")
+        print(path)
+        response =  {
+        "response_type": "file",
+        "c_t": "image/jpeg",
+        "path": path,
+        "name": f"{filename}.jpg"}
+    except Exception as ex:
+        response =  {
+            "response_type": "text",
+            "message": ex,
+            "status-code": HTTPStatus.BAD_REQUEST
+        }            
+    return response
+
+
+@app.post('/apps/srcnn/enh', tags=["Prediction"])
+def enhance(file: bytes = File(...)):
+
+    filename = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
+    image_bytes = Image.open(io.BytesIO(file)).convert("RGB")
+    imagePath = f"{original_path}/data/raw/request/{filename}.jpg"
+    image_bytes.save(imagePath)
+    image_type = imghdr.what(imagePath)
+    (x,y) = image_bytes.size
+    path = sr.performSR(cv2.imread(imagePath),original_path,f"{filename}.jpg")
+    print(path)
+    return FileResponse(path= path,media_type="image/jpeg",filename= f"{filename}.jpg")
 
 
 @app.get('/apps/srcnn/weight/{weight_name}',tags=["Models"])

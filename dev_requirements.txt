@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+python-multipart
+pandas
+Pillow
+PyYAML
+httplib2
+pydantic
+opencv-python
+tensorflow~=2.8.0
+keras~=2.8.0

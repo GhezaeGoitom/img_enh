@@ -22,7 +22,7 @@ class PredictModel:
                         activation='linear', padding='valid', use_bias=True))
         
         # define optimizer
-        adam = Adam(lr=0.0003)
+        adam = Adam(learning_rate=0.0003)
         SRCNN.compile(optimizer=adam, loss='mean_squared_error', metrics=['accuracy'])
         return SRCNN
 
