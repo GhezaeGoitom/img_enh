@@ -14,7 +14,7 @@ jobs:
       - 
         uses: mr-smithers-excellent/docker-build-push@v3
         with:
-          image: ggapps1996/image-enhancement
+          image: ggapps1996/image-enhancement:0.1
           registry: docker.io
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
