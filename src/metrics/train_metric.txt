@@ -7,3 +7,7 @@ model_with_layer: 9,3,5
 model_with_layer: 9,5,5 
  accuracy: 0.005779797211289406, 
  val_accuracy: 0.0022085581440478563, training_time: 354.3447735309601 
+model_with_layer: 9,1,5 
+ accuracy: 0.04829776659607887, 
+ val_accuracy: 0.006947614718228579,  
+ training_time: 6.285721778869629 
