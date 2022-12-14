@@ -1,4 +1,4 @@
-name: quality_assurance_workflow
+name: pylint
 
 on:
   push:
