@@ -1,7 +1,7 @@
 image_enhancement
 ==============================
 
-![Testing src & app](https://github.com/se4ai2223-uniba/image_enhancement/actions/workflows/Api_testing.yml)
+![Testing Api](https://github.com/se4ai2223-uniba/image_enhancement/actions/workflows/Api_testing.yml/badge.svg)
 
 
 this project is for creating a system that can enahnce an image
