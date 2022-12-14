@@ -43,12 +43,7 @@ class MakeDatasets:
         
         for (_, _, files) in os.walk(crsPath):
             for filename in files:
-            # imgs.append(filename)
-                    if i > 100:
-                        break
-                    else:
-                        i = i+1  
-                        imgs.append(filename)
+                imgs.append(filename)
 
 
         #counting range for cycles

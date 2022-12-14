@@ -163,7 +163,7 @@ def kernels( request: Request,
     } 
        
 
-@app.post('/apps/srcnn/enhance', tags=["Prediction"])
+@app.post('/apps/srcnn/enhanceByParams', tags=["Prediction"])
 @construct_response
 def enhance( request: Request,
     response: Response,enhance: EnhanceModel = Depends(), file: bytes = File(...)):
@@ -215,52 +215,7 @@ def enhance( request: Request,
         }            
     return response
 
-
-
-
-@app.post('/apps/srcnn/enhancement', tags=["Prediction"])
-@construct_response
-def enhance( request: Request,
-    response: Response, file: bytes = File(...)):
-
-    filename = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
-    image_bytes = Image.open(io.BytesIO(file)).convert("RGB")
-    imagePath = f"{original_path}/data/raw/request/{filename}.jpg"
-    image_bytes.save(imagePath)
-    image_type = imghdr.what(imagePath)
-    (x,y) = image_bytes.size
-    
-    if x == 0 and y == 0 :
-        return {
-        "response_type": "text",    
-        "message": "please choose valid image",
-        "status-code": HTTPStatus.BAD_REQUEST}
-
-    if image_type not in ["jpeg","jpg"]:
-        return {
-        "response_type": "text",    
-        "message": "please choose valid image type of jpeg",
-        "status-code": HTTPStatus.BAD_REQUEST}
-    
-    try:
-       
-        path = sr.performSR(cv2.imread(imagePath),original_path,f"{filename}.jpg")
-        print(path)
-        response =  {
-        "response_type": "file",
-        "c_t": "image/jpeg",
-        "path": path,
-        "name": f"{filename}.jpg"}
-    except Exception as ex:
-        response =  {
-            "response_type": "text",
-            "message": ex,
-            "status-code": HTTPStatus.BAD_REQUEST
-        }            
-    return response
-
-
-@app.post('/apps/srcnn/enh', tags=["Prediction"])
+@app.post('/apps/srcnn/enhance', tags=["Prediction"])
 def enhance(file: bytes = File(...)):
 
     filename = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(5))
