@@ -1,4 +1,4 @@
-name: api_testing_workflow
+name: api_testing
 
 on:
   push:
