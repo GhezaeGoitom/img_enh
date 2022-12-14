@@ -1,5 +1,14 @@
 image_enhancement
 ==============================
+[![Testing Api](https://github.com/se4ai2223-uniba/image_enhancement/actions/workflows/Api_testing.yml/badge.svg)](https://github.com/se4ai2223-uniba/image_enhancement/actions/workflows/Api_testing.yml)
+
+[![pylint](https://github.com/se4ai2223-uniba/image_enhancement/actions/workflows/QA_workflow.yml/badge.svg)](https://github.com/se4ai2223-uniba/image_enhancement/actions/workflows/QA_workflow.yml)
+
+[![Testing Api](https://github.com/se4ai2223-uniba/image_enhancement/actions/workflows/ci.yml/badge.svg)](https://github.com/se4ai2223-uniba/image_enhancement/actions/workflows/ci.yml)
+
+
+
+
 
 this project is for creating a system that can enahnce an image
 
