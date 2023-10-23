@@ -1,6 +1,7 @@
 <p align="center">
-    <img src="https://github.com/GhezaeGoitom/img_res_react/blob/main/src/logo.png" alt="Photo Enhancer logo"/>
+    <img src="https://github.com/GhezaeGoitom/img_res_react/blob/main/src/logo.png" alt="Photo Enhancer logo" style="width: 50%;"/>
 </p>
+
 
 image_enhancement
 ==============================
