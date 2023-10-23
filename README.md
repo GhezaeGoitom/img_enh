@@ -1,3 +1,7 @@
+<p align="center">
+    <img src="https://github.com/GhezaeGoitom/img_res_react/blob/main/src/logo.png" alt="Photo Enhancer logo"/>
+</p>
+
 image_enhancement
 ==============================
 [![Testing Api](https://github.com/se4ai2223-uniba/image_enhancement/actions/workflows/Api_testing.yml/badge.svg)](https://github.com/se4ai2223-uniba/image_enhancement/actions/workflows/Api_testing.yml)
